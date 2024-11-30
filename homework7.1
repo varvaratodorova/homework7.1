@@ -1,0 +1,100 @@
+using System;
+
+class Program
+{
+    static char[] board = new char[9] { '1', '2', '3', '4', '5', '6', '7', '8', '9' }; 
+    static int player = 1; 
+    static int choice; 
+    static int flag = 0; 
+
+    static void DisplayBoard()
+    {
+        Console.Clear();
+        Console.WriteLine("Хрестики-Нолики");
+        Console.WriteLine("Гравець 1 (X) vs Гравець 2 (O)");
+        Console.WriteLine();
+        Console.WriteLine(" {0} | {1} | {2} ", board[0], board[1], board[2]);
+        Console.WriteLine("---|---|---");
+        Console.WriteLine(" {0} | {1} | {2} ", board[3], board[4], board[5]);
+        Console.WriteLine("---|---|---");
+        Console.WriteLine(" {0} | {1} | {2} ", board[6], board[7], board[8]);
+        Console.WriteLine();
+    }
+
+    static void PlayerTurn()
+    {
+        Console.WriteLine("Гравець {0}, оберіть клітинку (1-9): ", player);
+        bool validInput = false;
+
+        while (!validInput)
+        {
+            string input = Console.ReadLine();
+            if (int.TryParse(input, out choice) && choice >= 1 && choice <= 9 && board[choice - 1] != 'X' && board[choice - 1] != 'O')
+            {
+                validInput = true;
+            }
+            else
+            {
+                Console.WriteLine("Некоректний вибір. Спробуйте ще раз.");
+            }
+        }
+
+        board[choice - 1] = (player == 1) ? 'X' : 'O';
+    }
+
+    static bool CheckWin()
+    {
+        int[,] winPatterns = new int[,] {
+            { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, //горизонталі
+            { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, //вертикалі
+            { 0, 4, 8 }, { 2, 4, 6 } //діагоналі
+        };
+
+        for (int i = 0; i < winPatterns.GetLength(0); i++)
+        {
+            if (board[winPatterns[i, 0]] == board[winPatterns[i, 1]] && board[winPatterns[i, 1]] == board[winPatterns[i, 2]])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static bool CheckDraw()
+    {
+        foreach (char c in board)
+        {
+            if (c != 'X' && c != 'O')
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static void Main(string[] args)
+    {
+        do
+        {
+            DisplayBoard(); 
+            PlayerTurn(); //гравець робить хід
+            flag = (CheckWin()) ? 1 : (CheckDraw()) ? -1 : 0; //виграш чи нічия
+
+            player = (player == 1) ? 2 : 1; //зміна гравця
+
+        } while (flag == 0); 
+
+        DisplayBoard(); 
+
+        if (flag == 1)
+        {
+            Console.WriteLine("Гравець {0} виграв!", (player == 1) ? 2 : 1);
+        }
+        else
+        {
+            Console.WriteLine("Нічия!");
+        }
+
+        Console.ReadLine();
+    }
+}
